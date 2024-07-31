@@ -15,16 +15,16 @@ uri = uri_helper.uri_from_env(default='radio://0/80/2M/E7E7E7E7E7')
 start_position = (0.0, 0.0, 0.4, 0)  # x, y, z, yaw
 
 # Fixed velocity (m/s)
-velocity = 0.05  # adjust this value as needed
+velocity = 0.03  # adjust this value as needed
 
 # Time interval (s)
-dt = 1
+dt = 0.01
 
 # Control inputs (angular velocity in radians/s)
-angular_velocity_sequence = [0.0,0.0,0.0,0.0,-math.pi/2,0.0,0.0,0.0,0.0,0.0,0.0]
+angular_velocity_sequence = [0.0,0.0,0.0,0.0,+math.pi/2,0.0,0.0,0.0,0.0,0.0,0.0,+math.pi/2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
 
 # Number of steps for each control input
-steps_per_control = 1
+steps_per_control = 100
 
 # Safety limits
 max_change = 1.0  # maximum allowed change in x or y (m)
@@ -119,10 +119,12 @@ def run_sequence(scf, start_position, velocity, angular_velocity_sequence, dt, s
                 print('Exceeded safety limit. Landing...')
                 cf.commander.send_position_setpoint(x, y, 0, math.degrees(yaw))
                 time.sleep(0.1)
-                cf.commander.send_stop_setpoint()
+                commander.land(0.0, 0.5)
+                cf.commander.stop()
                 return
 
             cf.commander.send_position_setpoint(x, y, z, math.degrees(yaw))
+            print(x, y, z, yaw)
             time.sleep(dt)
 
     # Land after completing the sequence
